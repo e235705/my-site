@@ -1,0 +1,125 @@
+/* common/ui.css */
+
+/* 全体共通 */
+body{
+    margin:0;
+    background:#000;
+    color:#46ff7a;
+    font-family:"SF Mono","Consolas","Menlo",monospace;
+    padding:20px;
+  }
+  
+  /* パス表示 */
+  #path{
+    font-size:18px;
+    border-bottom:1px solid #1d5f32;
+    padding-bottom:6px;
+    margin-bottom:18px;
+  }
+  
+  /* ページ本文 */
+  #content h2{
+    margin:8px 0 14px;
+  }
+  #content h3{
+    margin:10px 0 6px;
+  }
+  #content .section{
+    margin-top:18px;
+  }
+  #content ul{
+    margin:4px 0 0 18px;
+    padding:0;
+  }
+  #content p{
+    margin:4px 0;
+  }
+  
+  /* 日本語変換ログオーバーレイ */
+  #lang-log{
+    position:fixed;
+    inset:0;
+    background:#000;
+    padding:20px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    color:#46ff7a;
+    font-size:13px;
+    font-family:"SF Mono","Consolas","Menlo",monospace;
+    opacity:1;
+    transition:opacity 0.4s;
+    pointer-events:none;
+    z-index:10;
+  }
+  
+  /* コマンドライン全体 */
+  #cmd{
+    margin-top:40px;
+    border-top:1px solid #1d5f32;
+    padding-top:12px;
+  }
+  
+  /* ログ表示エリア */
+  #terminal-log{
+    min-height:40px;
+    margin-bottom:8px;
+    font-size:13px;
+  }
+  #terminal-log .line{
+    margin:2px 0;
+  }
+  
+  /* 入力行 */
+  #input-line{
+    display:flex;
+    align-items:center;
+  }
+  #prompt{
+    margin-right:6px;
+  }
+  #cmd-input{
+    background:none;
+    border:none;
+    outline:none;
+    color:#46ff7a;
+    font-family:"SF Mono","Consolas","Menlo",monospace;
+    font-size:14px;
+    flex:1;
+  }
+  
+  /* yes後の選択式 cd リスト */
+  #choice-list{
+    margin-top:4px;
+  }
+  .choice-item{
+    padding:2px 4px;
+    margin:2px 0;
+    cursor:pointer;
+  }
+  .choice-item.active{
+    background:rgba(70,255,122,0.2);
+  }
+  
+  /* Tab 一覧用（横並び） */
+  #tab-list{
+    margin-top:4px;
+    font-size:12px;
+    opacity:0.85;
+  }
+  
+  /* シンプルリンク */
+  a{
+    color:#46ff7a;
+    text-decoration:underline;
+  }
+  .label{
+    font-weight:bold;
+  }
+  .value{
+    margin-left:10px;
+  }
+  .item{
+    margin-top:10px;
+  }
+  

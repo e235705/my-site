@@ -1,0 +1,112 @@
+/* main.css: ポートフォリオサイト共通スタイル */
+
+/* ベース */
+body {
+    margin: 0;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    background: #fafafa;
+    color: #333;
+  }
+  
+  a {
+    color: #000;
+    text-decoration: none;
+  }
+  
+  a:hover {
+    opacity: 0.7;
+  }
+  
+  /* HERO セクション */
+  .hero {
+    width: 100%;
+    padding: 60px 20px;
+    background: #ffffff;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+  }
+  
+  .profile-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .profile-icon {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #ddd;
+  }
+  
+  .profile-info h1 {
+    font-size: 1.8rem;
+    margin: 10px 0 5px;
+  }
+  
+  .profile-info p {
+    font-size: 1rem;
+    margin: 0;
+  }
+  
+  /* グローバルメニュー */
+  .global-menu {
+    margin-top: 20px;
+  }
+  
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 120px);
+    gap: 15px;
+    justify-content: center;
+  }
+  
+  .menu-item {
+    display: block;
+    padding: 15px 0;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    text-align: center;
+    font-weight: bold;
+  }
+  
+  /* タイムライン */
+  .timeline {
+    padding: 40px 20px;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  
+  .section-title {
+    font-size: 1.6rem;
+    margin-bottom: 20px;
+    border-left: 4px solid #000;
+    padding-left: 10px;
+  }
+  
+  .timeline-item {
+    padding: 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+  }
+  
+  .timeline-date {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 8px;
+  }
+  
+  .timeline-title {
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+  }
+  
+  .timeline-description {
+    font-size: 1rem;
+    margin: 0;
+  }
+  

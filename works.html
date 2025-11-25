@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>WORKS</title>
+<link rel="stylesheet" href="common/ui.css">
+</head>
+<body>
+
+<div id="path">/home/user/works</div>
+
+<!-- ja.lang ログ -->
+<div id="lang-log">
+  <div>>> loading "ja.lang"</div>
+  <div>>> applying translation...</div>
+  <div>>> converting strings...</div>
+  <div>>> done.</div>
+</div>
+
+<main id="content">
+  <h2>WORKS</h2>
+
+  <section class="section">
+    <h3>Unity 2D アクションゲーム</h3>
+    <ul>
+      <li>2D 横スクロールアクションの試作（ジャンプ・攻撃・当たり判定・ノックバックなど）</li>
+      <li>ステージ構成や敵配置のパターンを変えながら、遊びやすさと難易度のバランスを確認中</li>
+      <li>将来的には「短時間で何度も遊べる」タイプのゲームとしてパブリッシュを目標</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h3>Web アプリ「TodoBot」</h3>
+    <ul>
+      <li>Todo リスト管理＋簡易ボット機能を組み合わせた Web アプリ</li>
+      <li>Python / Web 技術を使い、タスクの登録・完了・一覧、簡単な対話応答を実装</li>
+      <li>学習や日々の作業ログと連携させることで「自分専用の補助ツール」にしていくことを想定</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h3>connpass での活動実績</h3>
+    <ul>
+      <li>機械学習・Web・インフラなど、興味のある分野の勉強会・イベントに参加</li>
+      <li>実際のエンジニアや学生と交流しながら、技術トレンドや開発現場の雰囲気をキャッチアップ</li>
+      <li>今後は「聞く側」だけでなく「発表する側」にも挑戦していくことを目標としている</li>
+    </ul>
+  </section>
+</main>
+
+<!-- ターミナル UI -->
+<div id="cmd">
+  <div id="terminal-log"></div>
+  <div id="input-line">
+    <div id="prompt">>>></div>
+    <input id="cmd-input" autocomplete="off">
+  </div>
+  <div id="choice-list"></div>
+  <div id="tab-list"></div>
+</div>
+
+<script src="common/navigation.js"></script>
+<script src="common/terminal.js"></script>
+</body>
+</html>

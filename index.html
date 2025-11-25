@@ -1,0 +1,595 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>A.S.T.E.R.I.A System — Boot Interface</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<style>
+:root{
+  --fg:#46ff7a;
+  --fg-dim:#1d5f32;
+  --bg:#000;
+}
+html,body{
+  margin:0;
+  padding:0;
+  background:#000;
+  color:var(--fg);
+  font-family:"SF Mono","Consolas","Menlo",monospace;
+  height:100%;
+  overflow:hidden;
+}
+.hidden{ display:none; }
+
+/* 0/1 背景 */
+#binary-bg{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  z-index:10;
+  overflow:hidden;
+  color:rgba(70,255,122,0.35);
+  font-size:14px;
+  line-height:0.9;
+  pointer-events:none;
+  white-space:pre;
+  opacity:1;
+  transition:opacity .25s linear;
+}
+
+/* タイトル画面 */
+#title-screen{
+  position:absolute;
+  inset:0;
+  z-index:20;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  opacity:1;
+  transition:opacity .5s;
+}
+#title-main{
+  font-size:48px;
+  letter-spacing:0.15em;
+  font-weight:700;
+  margin-bottom:20px;
+}
+#title-sub{
+  font-size:16px;
+  opacity:0.8;
+}
+
+/* メインレイアウト */
+#screen{
+  position:absolute;
+  inset:0;
+  padding:16px;
+  box-sizing:border-box;
+}
+
+/* ブートログ */
+#boot-log{
+  position:absolute;
+  top:8px;
+  left:16px;
+  right:16px;
+  bottom:12px;
+  overflow:hidden;
+  font-size:13px;
+}
+#boot-log-inner{
+  position:absolute;
+  top:0;
+  left:0;
+}
+
+/* CRT ノイズ（中央フラッシュ + 横線 + 縦筋） */
+#crt-flash{
+  position:absolute;
+  inset:0;
+  z-index:40;
+  pointer-events:none;
+  opacity:0;
+  background:
+    radial-gradient(circle at center,
+      rgba(255,255,255,1) 0%,
+      rgba(255,255,255,0.9) 20%,
+      rgba(255,255,255,0.5) 35%,
+      rgba(255,255,255,0.0) 70%);
+}
+#crt-hline{
+  position:absolute;
+  top:50%;
+  left:0;
+  width:100%;
+  height:3px;
+  background:white;
+  opacity:0;
+  z-index:41;
+  pointer-events:none;
+}
+#crt-vlines{
+  position:absolute;
+  inset:0;
+  background:repeating-linear-gradient(
+    to right,
+    rgba(255,255,255,0.35) 0,
+    rgba(255,255,255,0.35) 2px,
+    transparent 4px
+  );
+  opacity:0;
+  z-index:42;
+  pointer-events:none;
+}
+
+/* ターミナル */
+#terminal{
+  position:absolute;
+  inset:16px;
+  display:none;
+  flex-direction:column;
+  z-index:30;
+}
+#question-line{
+  min-height:24px;
+  margin-bottom:4px;
+}
+
+/* 入力行（カスタムカーソル制御用） */
+#input-line{
+  position:relative;
+  display:flex;
+  align-items:center;
+  margin:4px 0 8px 0;
+}
+#prompt{
+  margin-right:6px;
+}
+#input-text{
+  white-space:pre;
+}
+
+/* 実際の input は見えない（フォーカス用ダミー） */
+#answer-input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+
+/* cd 選択リスト */
+#choice-list{
+  margin-bottom:4px;
+}
+.choice-item{
+  padding:2px 4px;
+  margin:2px 0;
+  cursor:pointer;
+}
+.choice-item.active{
+  background:rgba(70,255,122,0.2);
+}
+
+#tab-list{
+  margin-top:4px;
+  font-size:12px;
+  color:var(--fg-dim);
+}
+
+/* ログ出力 */
+#terminal-log{
+  flex:1;
+  overflow-y:auto;
+  margin-top:10px;
+}
+#terminal-log .line{
+  margin:2px 0;
+}
+
+/* ブリンクカーソル（共通：常に1個だけ使う） */
+.cursor{
+  display:inline-block;
+  width:10px;
+  height:1.05em;
+  background:var(--fg);
+  margin-left:4px;
+  animation:blink .9s infinite;
+}
+@keyframes blink{
+  0%,50%{opacity:1;}
+  51%,100%{opacity:0;}
+}
+
+/* 回答行カーソルは初期は非表示 */
+#input-cursor{
+  display:none;
+}
+</style>
+</head>
+
+<body>
+
+<!-- CRT ノイズ -->
+<div id="crt-flash"></div>
+<div id="crt-hline"></div>
+<div id="crt-vlines"></div>
+
+<!-- 0/1 背景 -->
+<div id="binary-bg"></div>
+
+<!-- タイトル -->
+<div id="title-screen">
+  <div id="title-main">A.S.T.E.R.I.A System</div>
+  <div id="title-sub">click to boot</div>
+</div>
+
+<!-- メイン -->
+<div id="screen">
+  <div id="boot-log"><div id="boot-log-inner"></div></div>
+
+  <div id="terminal">
+    <div id="question-line"></div>
+
+    <div id="input-line">
+      <div id="prompt">>>></div>
+      <span id="input-text"></span>
+      <span id="input-cursor" class="cursor"></span>
+      <input id="answer-input" autocomplete="off">
+    </div>
+
+    <div id="choice-list"></div>
+    <div id="tab-list"></div>
+    <div id="terminal-log"></div>
+  </div>
+</div>
+
+<script>
+/* 0/1 背景（行数 +3） */
+const bin = document.getElementById("binary-bg");
+function fillBinary(){
+  let out = "";
+  const cols = Math.floor(window.innerWidth / 7.5);
+  const rows = Math.floor(window.innerHeight / 14) + 17; // 縦多め
+
+  for(let y=0; y<rows; y++){
+    for(let x=0; x<cols; x++){
+      out += Math.random() < 0.5 ? "0" : "1";
+    }
+    out += "\n";
+  }
+  bin.textContent = out;
+}
+fillBinary();
+setInterval(fillBinary,150);
+
+/* タイトルクリック → ブート開始 */
+const titleScreen = document.getElementById("title-screen");
+titleScreen.addEventListener("click",()=>{
+  titleScreen.style.opacity = 0;
+  setTimeout(()=>{
+    titleScreen.style.display="none";
+    startBoot();
+  },500);
+});
+
+/* ブートログ候補 */
+const BOOT_LABEL_POOL = [
+  "system.core","system.cpu","system.memory","system.fs","system.net",
+  "system.graphics","system.audio","system.locale","system.time",
+  "system.services","system.process","system.scheduler","system.display",
+  "system.input","kernel.driver","kernel.modules","kernel.syscall",
+  "os.loader","os.session","hw.bus","hw.disk","hw.gpu","hw.sensor",
+  "security.firewall","security.crypto","security.auth","security.audit",
+  "app.launcher","ui.engine","vmachine.core"
+];
+
+/* 8〜12 行だけ作る */
+function makeBootLines(){
+  const pool = [...BOOT_LABEL_POOL];
+  const lineCount = 8 + Math.floor(Math.random()*5); // 8〜12 行
+  const lines = [];
+  for(let i=0; i<lineCount; i++){
+    const idx = Math.floor(Math.random()*pool.length);
+    const label = pool.splice(idx,1)[0];
+    lines.push(label + " ............. ");
+  }
+  return lines;
+}
+
+/* 1行ずつタイプ → OK */
+const bootLogInner = document.getElementById("boot-log-inner");
+function typeBootLine(baseText, done){
+  const div = document.createElement("div");
+  bootLogInner.appendChild(div);
+  const wrap = document.getElementById("boot-log");
+  let i=0;
+
+  function typeChar(){
+    if(i < baseText.length){
+      div.textContent += baseText[i++];
+      wrap.scrollTop = bootLogInner.scrollHeight;
+      const delay = 20 + Math.random()*120;
+      setTimeout(typeChar, delay);
+    }else{
+      const beforeOk = 600 + Math.random()*900;
+      setTimeout(()=>{
+        div.textContent = baseText + "OK";
+        wrap.scrollTop = bootLogInner.scrollHeight;
+        const afterOk = 700 + Math.random()*800;
+        setTimeout(done, afterOk);
+      }, beforeOk);
+    }
+  }
+  typeChar();
+}
+
+/* ブート開始 */
+function startBoot(){
+  const bootLines = makeBootLines();
+  let idx=0;
+  function next(){
+    if(idx >= bootLines.length){
+      setTimeout(()=>{ triggerCRT(); },500);
+      return;
+    }
+    typeBootLine(bootLines[idx++], next);
+  }
+  next();
+}
+
+/* CRT ノイズ（中央フラッシュ） */
+const crtFlash = document.getElementById("crt-flash");
+const crtH = document.getElementById("crt-hline");
+const crtV = document.getElementById("crt-vlines");
+
+function triggerCRT(){
+  bootLogInner.innerHTML = "";
+
+  crtFlash.style.opacity = 1;
+  crtH.style.opacity = 1;
+  crtV.style.opacity = 1;
+  crtH.style.top = "50%";
+
+  setTimeout(()=>{
+    crtFlash.style.opacity = 0;
+    crtH.style.opacity = 0;
+    crtV.style.opacity = 0;
+
+    bin.style.display="none";
+    document.getElementById("boot-log").style.display="none";
+
+    startCursorBlink();
+  },150);
+}
+
+/* カーソルだけチカチカ → 質問 */
+const questionLine = document.getElementById("question-line");
+const terminal = document.getElementById("terminal");
+const inputHidden = document.getElementById("answer-input");
+const inputTextSpan = document.getElementById("input-text");
+const inputCursor = document.getElementById("input-cursor");
+
+let currentInput = "";
+function redrawInput(){
+  inputTextSpan.textContent = currentInput;
+}
+
+function startCursorBlink(){
+  terminal.style.display="flex";
+  // 回答行カーソルは必ず消しておく
+  inputCursor.style.display = "none";
+  // 質問行にだけカーソル
+  questionLine.innerHTML = '<span class="cursor" id="question-cursor"></span>';
+
+  const delay = 2000 + Math.random()*1000; // 2〜3秒
+  setTimeout(()=>{
+    // 質問行のカーソルを消してから文字表示開始
+    questionLine.innerHTML = "";
+    typeQuestion(">>> access portfolio system? [yes/no]");
+  },delay);
+}
+
+/* 質問タイピング（遅め） */
+let state = "boot";
+function typeQuestion(str){
+  questionLine.textContent = "";
+  let i=0;
+  function t(){
+    if(i < str.length){
+      questionLine.textContent += str[i++];
+      setTimeout(t,60 + Math.random()*120);
+    }else{
+      // 質問行にはカーソルを残さない
+      state = "yesno";
+      currentInput = "";
+      redrawInput();
+      // この瞬間にだけ回答行カーソルを ON
+      inputCursor.style.display = "inline-block";
+    }
+  }
+  t();
+}
+
+/* 状態管理 & 出力 */
+let choiceIndex = 0;
+const termLog = document.getElementById("terminal-log");
+const choiceList = document.getElementById("choice-list");
+const tabList = document.getElementById("tab-list");
+
+function printLine(msg){
+  const d=document.createElement("div");
+  d.className="line";
+  d.textContent=">>> "+msg;
+  termLog.appendChild(d);
+  termLog.scrollTop=termLog.scrollHeight;
+}
+
+/* yes/no → 選択 or manual */
+function handleYesNo(v){
+  const a=v.trim().toLowerCase();
+  if(a==="yes"||a==="y"){
+    printLine("initializing navigation shortcuts...");
+    state="choice";
+    currentInput="";
+    redrawInput();
+    inputCursor.style.display="none"; // cd選択中はカーソル無し
+    renderChoices();
+  }else if(a==="no"||a==="n"){
+    printLine("manual mode: use cd <page>. press Tab to list folders.");
+    state="manual";
+    inputCursor.style.display="inline-block";
+  }else{
+    printLine("please answer yes or no.");
+    state="yesno";
+    inputCursor.style.display="inline-block";
+  }
+}
+
+/* cd 選択 */
+const PAGES=["works","profile","research","contact"];
+const PAGE_MAP={
+  works:"works.html",
+  profile:"profile.html",
+  research:"research.html",
+  contact:"contact.html"
+};
+
+function renderChoices(){
+  choiceList.innerHTML="";
+  choiceIndex=0;
+  PAGES.forEach((p,idx)=>{
+    const d=document.createElement("div");
+    d.className="choice-item";
+    d.dataset.page=p;
+    d.textContent=">>> cd "+p;
+    if(idx===0) d.classList.add("active");
+    d.addEventListener("click",()=>{
+      choiceIndex=idx;
+      confirmChoice();
+    });
+    choiceList.appendChild(d);
+  });
+}
+
+function updateChoiceHighlight(){
+  const items=choiceList.querySelectorAll(".choice-item");
+  items.forEach((it,idx)=>{
+    it.classList.toggle("active", idx===choiceIndex);
+  });
+}
+
+function confirmChoice(){
+  const items=choiceList.querySelectorAll(".choice-item");
+  if(!items.length) return;
+  const p = items[choiceIndex].dataset.page;
+  location.href = PAGE_MAP[p];
+}
+
+/* manual mode */
+function resolvePage(x){
+  return PAGES.includes(x.toLowerCase()) ? x.toLowerCase() : null;
+}
+
+function handleCommand(raw){
+  const c=raw.trim();
+  if(c.startsWith("cd ")){
+    const d=c.slice(3).trim();
+    const r=resolvePage(d);
+    if(r){
+      printLine("changing directory to "+r+"/");
+      location.href=PAGE_MAP[r];
+    }else{
+      printLine("command not found: "+d);
+    }
+  }else{
+    printLine("command not found: "+c);
+  }
+}
+
+function showTabList(){
+  tabList.textContent = PAGES.map(p=>p+"/").join("  ");
+}
+
+function handleTab(e){
+  if(state!=="manual") return;
+  e.preventDefault();
+  const v=currentInput.trim();
+  if(!v.startsWith("cd")){
+    showTabList(); return;
+  }
+  const pref=v.slice(2).trim();
+  if(pref===""){ showTabList(); return; }
+  const m=PAGES.filter(p=>p.startsWith(pref.toLowerCase()));
+  if(m.length===1){
+    currentInput="cd "+m[0];
+    redrawInput();
+  }
+  showTabList();
+}
+
+/* Enter 確定 */
+function handleEnter(){
+  const v=currentInput;
+  currentInput="";
+  redrawInput();
+
+  // 念のため質問行のカーソルがあれば消す（安全策）
+  const qCur = questionLine.querySelector(".cursor");
+  if(qCur) qCur.remove();
+
+  if(state==="yesno"){
+    handleYesNo(v);
+  }else if(state==="choice"){
+    if(v.trim()==="") confirmChoice();
+    else handleCommand(v);
+  }else if(state==="manual"){
+    handleCommand(v);
+  }
+}
+
+/* キーイベント（カスタム入力） */
+window.addEventListener("keydown",e=>{
+  // ターミナル表示前は何もしない
+  if(terminal.style.display!=="flex") return;
+
+  // cd選択中
+  if(state==="choice"){
+    if(e.key==="ArrowDown"||e.key==="ArrowUp"){
+      e.preventDefault();
+      const items=choiceList.querySelectorAll(".choice-item");
+      if(!items.length) return;
+      if(e.key==="ArrowDown") choiceIndex=(choiceIndex+1)%items.length;
+      else choiceIndex=(choiceIndex-1+items.length)%items.length;
+      updateChoiceHighlight();
+    }else if(e.key==="Enter"){
+      e.preventDefault();
+      confirmChoice();
+    }
+    return;
+  }
+
+  // yesno / manual 入力中
+  if(e.key==="Enter"){
+    e.preventDefault();
+    handleEnter();
+  }else if(e.key==="Backspace"){
+    e.preventDefault();
+    if(currentInput.length>0){
+      currentInput=currentInput.slice(0,-1);
+      redrawInput();
+    }
+  }else if(e.key==="Tab"){
+    handleTab(e);
+  }else if(e.key.length===1 && !e.ctrlKey && !e.metaKey && !e.altKey){
+    currentInput += e.key;
+    redrawInput();
+    e.preventDefault();
+  }
+});
+</script>
+
+</body>
+</html>
